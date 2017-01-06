@@ -1,8 +1,12 @@
 --------------------------------------------------------------------------------
 -- hybrid.lua
--- Vim and Emacs keybindings for Mac.
+-- Vim and Emacs keybindings for Mac
 --------------------------------------------------------------------------------
 
+-- Boolean flag for hybrid mode
+hybrid_mode_enabled = false
+
+-- Modal keybindings
 local emacs = hs.hotkey.modal.new()
 local normal = hs.hotkey.modal.new()
 
@@ -11,29 +15,23 @@ function notify_user(title, text)
   hs.notify.new({title=title, informativeText=text}):send()
 end
 
--- Enable hybrid mode
-enter_hybrid_mode = hs.hotkey.bind({"cmd", "alt", "ctrl"}, "space", function()
-  emacs:enter()
-  notify_user('Hybrid', 'Hybrid Mode Enabled')
-end)
-
--- Disable hybrid mode
+-- Enable / Disable hybrid mode
 enterNormal = hs.hotkey.bind({"cmd"}, "escape", function()
-  emacs:exit()
-  normal:exit()
-  notify_user('Hybrid', 'Hybrid Mode Disabled')
+  if hybrid_mode_enabled then
+    hybrid_mode_enabled = false
+    emacs:exit()
+    normal:exit()
+    notify_user('Hybrid', 'Hybrid Mode Disabled')
+  else
+    hybrid_mode_enabled = true
+    emacs:enter()
+    notify_user('Hybrid', 'Hybrid Mode Enabled')
+  end
 end)
 
 --------------------------------------------------------------------------------
 -- Vim
 --------------------------------------------------------------------------------
-
--- Switch to vim normal mode
-emacs:bind({}, 'escape', function()
-  emacs:exit()
-  normal:enter()
-  notify_user('Normal', 'Vim Normal Mode')
-end)
 
 -- Movement related bindings
 function left()  hs.eventtap.keyStroke({}, "Left") end
@@ -150,4 +148,9 @@ end)
 -- Emacs
 --------------------------------------------------------------------------------
 
--- TODO: all of emacs bindings
+-- Switch to vim normal mode
+emacs:bind({}, 'escape', function()
+  emacs:exit()
+  normal:enter()
+  notify_user('Normal', 'Vim Normal Mode')
+end)
