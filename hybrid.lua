@@ -3,17 +3,16 @@
 --
 -- System-wide Vim and Emacs keybindings for Mac
 -- @author Andrew McBurney
---
 --------------------------------------------------------------------------------
-
--- Images for notifications
-local disable_image = hs.image.imageFromPath("./images/off.png")
-local enable_image = hs.image.imageFromPath("./images/on.png")
-local emacs_image = hs.image.imageFromPath("./images/emacs.png")
-local vim_image = hs.image.imageFromPath("./images/vim.png")
 
 -- Boolean flag for hybrid mode
 hybrid_mode_enabled = false
+
+-- Images for notifications
+local disable_image = hs.image.imageFromPath("./images/off.png")
+local enable_image  = hs.image.imageFromPath("./images/on.png")
+local emacs_image   = hs.image.imageFromPath("./images/emacs.png")
+local vim_image     = hs.image.imageFromPath("./images/vim.png")
 
 -- Modal keybindings
 local emacs = hs.hotkey.modal.new()
@@ -46,7 +45,7 @@ enterNormal = hs.hotkey.bind({"cmd"}, "escape", function()
   end
 end)
 
--- Movement related bindings
+-- Movement related functions
 function left()     hs.eventtap.keyStroke({}, "Left") end
 function right()    hs.eventtap.keyStroke({}, "Right") end
 function up()       hs.eventtap.keyStroke({}, "Up") end
@@ -54,10 +53,28 @@ function down()     hs.eventtap.keyStroke({}, "Down") end
 function back()     hs.eventtap.keyStroke({"alt"}, "Left") end
 function forward()  hs.eventtap.keyStroke({"alt"}, "Right") end
 
+-- Deletion related functions
+function delete_word_forward()
+  hs.eventtap.keyStroke({"alt", "shift"}, "Right")
+  hs.eventtap.keyStroke({}, "delete")
+end
+function delete_word_backward()
+  hs.eventtap.keyStroke({"alt", "shift"}, "Left")
+  hs.eventtap.keyStroke({}, "delete")
+end
+function delete_line()
+  hs.eventtap.keyStroke({"cmd"}, "Left")
+  hs.eventtap.keyStroke({"cmd", "shift"}, "Right")
+  hs.eventtap.keyStroke({}, "delete")
+end
+
 --------------------------------------------------------------------------------
 -- Vim
+--
+-- Keybindnigs for normal vim-mode
 --------------------------------------------------------------------------------
 
+-- Movement related bindings
 normal:bind({}, 'h', left, nil, left)
 normal:bind({}, 'l', right, nil, right)
 normal:bind({}, 'k', up, nil, up)
@@ -198,7 +215,6 @@ end)
 --
 -- Mac already has a lot of emacs keybindings by default, which is why this mode
 -- has less keybindings than the vim-mode
---
 --------------------------------------------------------------------------------
 
 -- Switch to vim normal mode
@@ -214,4 +230,9 @@ end)
 
 -- Movement related bindings
 emacs:bind({"alt"}, 'b', back, nil, back)
-emacs:bind({"alt"}, 'f', right, nil, right)
+emacs:bind({"alt"}, 'f', forward, nil, forward)
+
+-- Deletion related bindings
+emacs:bind({"ctrl"}, 'k', delete_line, nil, delete_line)
+emacs:bind({"alt"}, 'delete', delete_word_forward, nil, delete_word_forward)
+emacs:bind({"alt"}, 'd', delete_word_backward, nil, delete_word_backward)
