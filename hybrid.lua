@@ -5,12 +5,13 @@
 -- @author Andrew McBurney
 --------------------------------------------------------------------------------
 
+-- History of vim commands, max size of 10
+local command_history = {}
+
 -- Boolean flag for hybrid mode
 local hybrid_mode_enabled = false
 
 -- Images for notifications
-local disable_image = hs.image.imageFromPath("./images/off.png")
-local enable_image  = hs.image.imageFromPath("./images/on.png")
 local emacs_image   = hs.image.imageFromPath("./images/emacs.png")
 local vim_image     = hs.image.imageFromPath("./images/vim.png")
 
@@ -30,17 +31,17 @@ hs.hotkey.bind({"cmd"}, "escape", function()
     emacs:exit()
     normal:exit()
     notify_user(
-      'Hybrid',
-      'Hybrid-mode disabled. \'command\' + \'esc\' to re-enable',
-      disable_image
+      'Hybrid-mode Disabled',
+      'Hybrid-mode disabled. \'command\' + \'esc\' to enable',
+      nil
     )
   else
     hybrid_mode_enabled = true
     emacs:enter()
     notify_user(
-      'Hybrid',
+      'Hybrid-mode Enabled',
       'Hybrid-mode enabled. \'command\' + \'esc\' to disable',
-      enable_image
+      nil
     )
   end
 end)
@@ -66,8 +67,7 @@ end
 
 local function delete_line()
   hs.eventtap.keyStroke({"cmd"}, "Left")
-  hs.eventtap.keyStroke({"cmd", "shift"}, "Right")
-  hs.eventtap.keyStroke({}, "delete")
+  hs.eventtap.keyStroke({"ctrl"}, "k")
 end
 
 local function delete()
@@ -242,6 +242,5 @@ emacs:bind({"alt"}, 'b', back, nil, back)
 emacs:bind({"alt"}, 'f', forward, nil, forward)
 
 -- Deletion related bindings
-emacs:bind({"ctrl"}, 'k', delete_line, nil, delete_line)
 emacs:bind({"alt"}, 'delete', delete_word_forward, nil, delete_word_forward)
 emacs:bind({"alt"}, 'd', delete_word_backward, nil, delete_word_backward)
