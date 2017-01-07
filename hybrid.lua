@@ -6,7 +6,7 @@
 --------------------------------------------------------------------------------
 
 -- Boolean flag for hybrid mode
-hybrid_mode_enabled = false
+local hybrid_mode_enabled = false
 
 -- Images for notifications
 local disable_image = hs.image.imageFromPath("./images/off.png")
@@ -19,12 +19,12 @@ local emacs = hs.hotkey.modal.new()
 local normal = hs.hotkey.modal.new()
 
 -- Notify the user what mode they're in
-function notify_user(title, text, image)
+local function notify_user(title, text, image)
   hs.notify.new({title=title, informativeText=text, contentImage=image}):send()
 end
 
 -- Enable / Disable hybrid mode
-enterNormal = hs.hotkey.bind({"cmd"}, "escape", function()
+hs.hotkey.bind({"cmd"}, "escape", function()
   if hybrid_mode_enabled then
     hybrid_mode_enabled = false
     emacs:exit()
@@ -46,25 +46,36 @@ enterNormal = hs.hotkey.bind({"cmd"}, "escape", function()
 end)
 
 -- Movement related functions
-function left()     hs.eventtap.keyStroke({}, "Left") end
-function right()    hs.eventtap.keyStroke({}, "Right") end
-function up()       hs.eventtap.keyStroke({}, "Up") end
-function down()     hs.eventtap.keyStroke({}, "Down") end
-function back()     hs.eventtap.keyStroke({"alt"}, "Left") end
-function forward()  hs.eventtap.keyStroke({"alt"}, "Right") end
+local function left()     hs.eventtap.keyStroke({}, "Left") end
+local function right()    hs.eventtap.keyStroke({}, "Right") end
+local function up()       hs.eventtap.keyStroke({}, "Up") end
+local function down()     hs.eventtap.keyStroke({}, "Down") end
+local function back()     hs.eventtap.keyStroke({"alt"}, "Left") end
+local function forward()  hs.eventtap.keyStroke({"alt"}, "Right") end
 
 -- Deletion related functions
-function delete_word_forward()
+local function delete_word_forward()
   hs.eventtap.keyStroke({"alt", "shift"}, "Right")
   hs.eventtap.keyStroke({}, "delete")
 end
-function delete_word_backward()
+
+local function delete_word_backward()
   hs.eventtap.keyStroke({"alt", "shift"}, "Left")
   hs.eventtap.keyStroke({}, "delete")
 end
-function delete_line()
+
+local function delete_line()
   hs.eventtap.keyStroke({"cmd"}, "Left")
   hs.eventtap.keyStroke({"cmd", "shift"}, "Right")
+  hs.eventtap.keyStroke({}, "delete")
+end
+
+local function delete()
+  hs.eventtap.keyStroke({}, "delete")
+end
+
+local function fndelete()
+  hs.eventtap.keyStroke({}, "Right")
   hs.eventtap.keyStroke({}, "delete")
 end
 
@@ -83,6 +94,11 @@ normal:bind({}, 'b', back, nil, back)
 normal:bind({}, 'w', forward, nil, forward)
 normal:bind({}, 'e', forward, nil, forward)
 
+-- Deletion related bindings
+normal:bind({}, 'd', delete, nil, delete)
+normal:bind({}, 'x', fndelete, nil, fndelete)
+
+-- Enter insert mode
 normal:bind({}, 'i', function()
   normal:exit()
   emacs:enter()
@@ -151,17 +167,6 @@ normal:bind({"shift"}, 'o', nil, function()
   )
 end)
 
-local function delete()
-  hs.eventtap.keyStroke({}, "delete")
-end
-normal:bind({}, 'd', delete, nil, delete)
-
-local function fndelete()
-  hs.eventtap.keyStroke({}, "Right")
-  hs.eventtap.keyStroke({}, "delete")
-end
-normal:bind({}, 'x', fndelete, nil, fndelete)
-
 normal:bind({"shift"}, 'D', nil, function()
   normal:exit()
   emacs:enter()
@@ -191,21 +196,25 @@ normal:bind({}, 's', function()
   hs.eventtap.keyStroke({"alt"}, "space")
 end)
 
--- Search functionality
+-- Search
 normal:bind({}, '/', function() hs.eventtap.keyStroke({"cmd"}, "f") end)
 
+-- Undo
 normal:bind({}, 'u', function()
   hs.eventtap.keyStroke({"cmd"}, "z")
 end)
 
+-- Redo
 normal:bind({"ctrl"}, 'r', function()
   hs.eventtap.keyStroke({"cmd", "shift"}, "z")
 end)
 
+-- Yank
 normal:bind({}, 'y', function()
   hs.eventtap.keyStroke({"cmd"}, "c")
 end)
 
+-- Paste
 normal:bind({}, 'p', function()
   hs.eventtap.keyStroke({"cmd"}, "v")
 end)
