@@ -47,12 +47,16 @@ hs.hotkey.bind({"cmd"}, "escape", function()
 end)
 
 -- Movement related functions
-local function left()     hs.eventtap.keyStroke({}, "Left") end
-local function right()    hs.eventtap.keyStroke({}, "Right") end
-local function up()       hs.eventtap.keyStroke({}, "Up") end
-local function down()     hs.eventtap.keyStroke({}, "Down") end
-local function back()     hs.eventtap.keyStroke({"alt"}, "Left") end
-local function forward()  hs.eventtap.keyStroke({"alt"}, "Right") end
+local function right()              hs.eventtap.keyStroke({}, "Right")      end
+local function left()               hs.eventtap.keyStroke({}, "Left")       end
+local function up()                 hs.eventtap.keyStroke({}, "Up")         end
+local function down()               hs.eventtap.keyStroke({}, "Down")       end
+local function forward_word()       hs.eventtap.keyStroke({"alt"}, "Right") end
+local function backward_word()      hs.eventtap.keyStroke({"alt"}, "Left")  end
+local function forward_line()       hs.eventtap.keyStroke({"cmd"}, "Right") end
+local function backward_line()      hs.eventtap.keyStroke({"cmd"}, "Left")  end
+local function forward_paragraph()  hs.eventtap.keyStroke({"alt"}, "Up")    end
+local function backward_paragraph() hs.eventtap.keyStroke({"alt"}, "Down")  end
 
 -- Deletion related functions
 local function delete_word_forward()
@@ -66,7 +70,7 @@ local function delete_word_backward()
 end
 
 local function delete_line()
-  hs.eventtap.keyStroke({"cmd"}, "Left")
+  backward_line()
   hs.eventtap.keyStroke({"ctrl"}, "k")
 end
 
@@ -75,7 +79,7 @@ local function delete()
 end
 
 local function fndelete()
-  hs.eventtap.keyStroke({}, "Right")
+  right()
   hs.eventtap.keyStroke({}, "delete")
 end
 
@@ -90,9 +94,11 @@ normal:bind({}, 'h', left, nil, left)
 normal:bind({}, 'l', right, nil, right)
 normal:bind({}, 'k', up, nil, up)
 normal:bind({}, 'j', down, nil, down)
-normal:bind({}, 'b', back, nil, back)
-normal:bind({}, 'w', forward, nil, forward)
-normal:bind({}, 'e', forward, nil, forward)
+normal:bind({}, 'w', forward_word, nil, forward_word)
+normal:bind({}, 'e', forward_word, nil, forward_word)
+normal:bind({}, 'b', backward_word, nil, backward_word)
+normal:bind({"shift"}, '4', forward_line, nil, forward_line)
+normal:bind({"shift"}, '6', backward_line, nil, backward_line)
 
 -- Deletion related bindings
 normal:bind({}, 'd', delete, nil, delete)
@@ -110,7 +116,7 @@ normal:bind({}, 'i', function()
 end)
 
 normal:bind({"shift"}, 'i', function()
-  hs.eventtap.keyStroke({"cmd"}, "Left")
+  backward_line()
   normal:exit()
   emacs:enter()
   notify_user(
@@ -121,7 +127,7 @@ normal:bind({"shift"}, 'i', function()
 end)
 
 normal:bind({}, 'a', function()
-  hs.eventtap.keyStroke({}, "Right")
+  right()
   normal:exit()
   emacs:enter()
   notify_user(
@@ -132,7 +138,7 @@ normal:bind({}, 'a', function()
 end)
 
 normal:bind({"shift"}, 'a', function()
-  hs.eventtap.keyStroke({"cmd"}, "Right")
+  forward_line()
   normal:exit()
   emacs:enter()
   notify_user(
@@ -143,7 +149,7 @@ normal:bind({"shift"}, 'a', function()
 end)
 
 normal:bind({}, 'o', nil, function()
-  hs.eventtap.keyStroke({"cmd"}, "Right")
+  forward_line()
   normal:exit()
   emacs:enter()
   hs.eventtap.keyStroke({}, "Return")
@@ -155,7 +161,7 @@ normal:bind({}, 'o', nil, function()
 end)
 
 normal:bind({"shift"}, 'o', nil, function()
-  hs.eventtap.keyStroke({"cmd"}, "Left")
+  backward_line()
   normal:exit()
   emacs:enter()
   hs.eventtap.keyStroke({}, "Return")
@@ -174,17 +180,6 @@ normal:bind({"shift"}, 'D', nil, function()
   normal:enter()
 end)
 
-normal:bind({}, 'f', function()
-  normal:exit()
-  emacs:enter()
-  notify_user(
-    'Emacs',
-    'Emacs-mode enabled. \'esc\' to enable Vim-mode',
-    emacs_image
-  )
-  hs.eventtap.keyStroke({"alt"}, "space")
-end)
-
 normal:bind({}, 's', function()
   normal:exit()
   emacs:enter()
@@ -193,7 +188,7 @@ normal:bind({}, 's', function()
     'Emacs-mode enabled. \'esc\' to enable Vim-mode',
     emacs_image
   )
-  hs.eventtap.keyStroke({"alt"}, "space")
+  fndelete()
 end)
 
 -- Search
@@ -238,8 +233,10 @@ emacs:bind({}, 'escape', function()
 end)
 
 -- Movement related bindings
-emacs:bind({"alt"}, 'b', back, nil, back)
-emacs:bind({"alt"}, 'f', forward, nil, forward)
+emacs:bind({"alt"}, 'b', backward_word, nil, backward_word)
+emacs:bind({"alt"}, 'f', forward_word, nil, forward_word)
+emacs:bind({"alt", "shift"}, '[', forward_paragraph, nil, forward_paragraph)
+emacs:bind({"alt", "shift"}, ']', backward_paragraph, nil, backward_paragraph)
 
 -- Deletion related bindings
 emacs:bind({"alt"}, 'delete', delete_word_forward, nil, delete_word_forward)
