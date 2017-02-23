@@ -5,9 +5,6 @@
 -- @author: Andrew McBurney
 --------------------------------------------------------------------------------
 
--- History of vim commands, max size of 10
-local command_history = {}
-
 -- Boolean flag for hybrid mode
 local hybrid_mode_enabled = false
 
