@@ -129,6 +129,10 @@ local function vim_o() forward_line(); hs.eventtap.keyStroke({}, "Return") end
 
 -- Table representation of vim commands
 local vim = {}
+vim["nil"] = nothing
+
+-- Key to last used vim command
+local last_vim_command = "nil"
 
 -- Non-terminal commands
 vim[""]  = ""
@@ -161,7 +165,9 @@ listener = hs.eventtap.new({hs.eventtap.event.types.keyDown}, function(e)
   local key_code    = e:getKeyCode()
   local key_pressed = e:getCharacters()
 
-  if key_code >= 0 and key_code < 53 then
+  if key_code == 14 then
+    vim[last_vim_command]()
+  elseif key_code >= 0 and key_code < 51 then
     vim_history = vim_history .. key_pressed
   else
     return false
@@ -171,6 +177,7 @@ listener = hs.eventtap.new({hs.eventtap.event.types.keyDown}, function(e)
 
   if type(vim[vim_history]) == "function" then
     vim[vim_history]()
+    last_vim_command = vim_history
     vim_history = ""
   end
 end)
@@ -182,6 +189,7 @@ end)
 -- an effect on the key listener
 --------------------------------------------------------------------------------
 
+normal:bind({}, '.', nothing, nil)
 normal:bind({}, 'a', nothing, nil)
 normal:bind({"shift"}, 'a', nothing, nil)
 normal:bind({}, 'b', nothing, nil)
