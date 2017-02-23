@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
--- hs-hybrid
+-- @module: hs-hybrid
 --
--- System-wide Vim and Emacs keybindings for Mac
+-- @usage:  System-wide Vim and Emacs keybindings for Mac
 -- @author: Andrew McBurney
 --------------------------------------------------------------------------------
 
@@ -87,7 +87,7 @@ end
 --------------------------------------------------------------------------------
 -- Vim
 --
--- Keybindnigs for normal vim-mode
+-- @see: Keybindnigs for normal vim-mode
 --------------------------------------------------------------------------------
 
 -- Movement related bindings
@@ -221,8 +221,8 @@ end)
 --------------------------------------------------------------------------------
 -- Emacs
 --
--- Mac already has a lot of emacs keybindings by default, which is why this mode
--- has less keybindings than the vim-mode
+-- @see: Mac already has a lot of emacs keybindings by default, which is why
+-- this mode has less keybindings than the vim-mode
 --------------------------------------------------------------------------------
 
 -- Switch to vim normal mode
