@@ -5,6 +5,9 @@
 -- @author: Andrew McBurney
 --------------------------------------------------------------------------------
 
+-- Submodule for vim keybindings
+local vim = require("hs-hybrid/trie")
+
 -- Boolean flag for hybrid mode
 local hybrid_mode_enabled = false
 
@@ -17,9 +20,46 @@ local hybrid_image = hs.image.imageFromPath("./hs-hybrid/images/hybrid.png")
 local emacs = hs.hotkey.modal.new()
 local normal = hs.hotkey.modal.new()
 
+-- Event listener for keys, used in vim normal mode
+local listener = hs.eventtap.new({hs.eventtap.event.types.keyDown}, function(e)
+  local keys = {'d'}
+  local key_pressed = e:getCharacters()
+  print(key_pressed)
+
+  if hs.fnutils.contains(keys, key_pressed) then
+    print("Found")
+  else
+    return false
+  end
+end)
+
 -- Notify the user what mode they're in
 local function notify_user(title, text, image)
   hs.notify.new({title=title, informativeText=text}):setIdImage(image):send()
+end
+
+-- Enter vim normal mode
+local function enter_vim_normal_mode()
+  listener:start()
+  emacs:exit()
+  normal:enter()
+  notify_user(
+    'Vim',
+    'Vim-mode enabled. Enter \'insert-mode\' for emacs bindings',
+    vim_image
+  )
+end
+
+-- Enter emacs / vim insert mode
+local function enter_emacs_and_vim_insert_mode()
+  listener:stop()
+  normal:exit()
+  emacs:enter()
+  notify_user(
+    'Emacs',
+    'Emacs-mode enabled. \'esc\' to enable Vim-mode',
+    emacs_image
+  )
 end
 
 -- Enable / Disable hybrid mode
@@ -28,6 +68,7 @@ hs.hotkey.bind({"cmd"}, "escape", function()
     hybrid_mode_enabled = false
     emacs:exit()
     normal:exit()
+    listener:stop()
     notify_user(
       'Hybrid-mode Disabled',
       'Hybrid-mode disabled. \'command\' + \'esc\' to enable',
@@ -107,107 +148,28 @@ normal:bind({}, 'x', fndelete, nil, fndelete)
 
 -- Enter insert mode
 normal:bind({}, 'i', function()
-  normal:exit()
-  emacs:enter()
-  notify_user(
-    'Emacs',
-    'Emacs-mode enabled. \'esc\' to enable Vim-mode',
-    emacs_image
-  )
+  enter_emacs_and_vim_insert_mode()
 end)
 
 normal:bind({"shift"}, 'i', function()
   backward_line()
-  normal:exit()
-  emacs:enter()
-  notify_user(
-    'Emacs',
-    'Emacs-mode enabled. \'esc\' to enable Vim-mode',
-    emacs_image
-  )
+  enter_emacs_and_vim_insert_mode()
 end)
 
 normal:bind({}, 'a', function()
   right()
-  normal:exit()
-  emacs:enter()
-  notify_user(
-    'Emacs',
-    'Emacs-mode enabled. \'esc\' to enable Vim-mode',
-    emacs_image
-  )
+  enter_emacs_and_vim_insert_mode()
 end)
 
 normal:bind({"shift"}, 'a', function()
   forward_line()
-  normal:exit()
-  emacs:enter()
-  notify_user(
-    'Emacs',
-    'Emacs-mode enabled. \'esc\' to enable Vim-mode',
-    emacs_image
-  )
+  enter_emacs_and_vim_insert_mode()
 end)
 
 normal:bind({}, 'o', nil, function()
   forward_line()
-  normal:exit()
-  emacs:enter()
+  enter_emacs_and_vim_insert_mode()
   hs.eventtap.keyStroke({}, "Return")
-  notify_user(
-    'Emacs',
-    'Emacs-mode enabled. \'esc\' to enable Vim-mode',
-    emacs_image
-  )
-end)
-
-normal:bind({"shift"}, 'o', nil, function()
-  backward_line()
-  normal:exit()
-  emacs:enter()
-  hs.eventtap.keyStroke({}, "Return")
-  hs.eventtap.keyStroke({}, "Up")
-  notify_user(
-    'Emacs',
-    'Emacs-mode enabled. \'esc\' to enable Vim-mode',
-    emacs_image
-  )
-end)
-
-normal:bind({"shift"}, 'D', nil, function()
-  normal:exit()
-  emacs:enter()
-  hs.eventtap.keyStroke({"ctrl"}, "k")
-  normal:enter()
-end)
-
-normal:bind({}, 's', function()
-  normal:exit()
-  emacs:enter()
-  notify_user(
-    'Emacs',
-    'Emacs-mode enabled. \'esc\' to enable Vim-mode',
-    emacs_image
-  )
-  fndelete()
-end)
-
--- Search
-normal:bind({}, '/', function() hs.eventtap.keyStroke({"cmd"}, "f") end)
-
--- Undo
-normal:bind({}, 'u', function()
-  hs.eventtap.keyStroke({"cmd"}, "z")
-end)
-
--- Redo
-normal:bind({"ctrl"}, 'r', function()
-  hs.eventtap.keyStroke({"cmd", "shift"}, "z")
-end)
-
--- Yank
-normal:bind({}, 'y', function()
-  hs.eventtap.keyStroke({"cmd"}, "c")
 end)
 
 -- Paste
@@ -224,13 +186,7 @@ end)
 
 -- Switch to vim normal mode
 emacs:bind({}, 'escape', function()
-  emacs:exit()
-  normal:enter()
-  notify_user(
-    'Vim',
-    'Vim-mode enabled. Enter \'insert-mode\' for emacs bindings',
-    vim_image
-  )
+ enter_vim_normal_mode()
 end)
 
 -- Movement related bindings
