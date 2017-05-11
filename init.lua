@@ -6,7 +6,7 @@
 --------------------------------------------------------------------------------
 
 -- String representation of the last number pressed
-local number_pressed = ""
+local number = 0
 
 -- Last function executed
 local last_function = nil
@@ -161,18 +161,19 @@ end
 
 local function delete_word_forward()
   hs.eventtap.keyStroke({"alt", "shift"}, "Right")
-  hs.eventtap.keyStroke({}, "delete")
+  delete()
 end
 
 local function delete_word_backward()
   hs.eventtap.keyStroke({"alt", "shift"}, "Left")
-  hs.eventtap.keyStroke({}, "delete")
+  delete()
 end
 
 local function delete_line()
   move_backward_line()
   hs.eventtap.keyStroke({"ctrl"}, "k")
   delete()
+  move_down()
 end
 
 --------------------------------------------------------------------------------
@@ -246,28 +247,26 @@ local function delete_backward_line()
   enter_vim_normal()
 end
 
-local function set_number(number)
-  print(number)
-  print("implement me")
+local function set_number(num)
+  number = number .. num
 end
 
 -- Execute a function 'number' amount of times
 local function execute_function(func)
-
-  func()
+  -- Execute function at least once, and no more than 20 times (interruptible)
+  for i = 0, math.max( 0, math.min( number - 1, 20 ) ), 1 do
+    func()
+  end
 
   last_function = func
+  number = 0
 end
 
 --------------------------------------------------------------------------------
--- Vim
+-- Vim normal mode
 --
 -- @see: Keybindings for normal vim-mode. Bind these to nil so they don't have
 -- an effect on the key listener
---------------------------------------------------------------------------------
-
---------------------------------------------------------------------------------
--- Vim normal mode
 --------------------------------------------------------------------------------
 
 -- Lowercase
@@ -304,13 +303,27 @@ normal:bind({}, '7', function() set_number(7) end)
 normal:bind({}, '8', function() set_number(8) end)
 normal:bind({}, '9', function() set_number(9) end)
 
--- Symbols / Other
-normal:bind({}, 'escape', function() end)
+-- Symbols
+normal:bind({"shift"}, '0', function() end)
+normal:bind({"shift"}, '1', function() end)
+normal:bind({"shift"}, '2', function() end)
+normal:bind({"shift"}, '3', function() end)
 normal:bind({"shift"}, '4', function() execute_function( move_forward_line ) end)
+normal:bind({"shift"}, '5', function() end)
 normal:bind({"shift"}, '6', function() execute_function( move_backward_line ) end)
+normal:bind({"shift"}, '7', function() end)
+normal:bind({"shift"}, '8', function() end)
+normal:bind({"shift"}, '9', function() end)
+
+-- Other
+normal:bind({}, '.', function() execute_function( last_function ) end)
+normal:bind({}, 'escape', function() number = 0 end)
 
 --------------------------------------------------------------------------------
 -- Vim delete mode
+--
+-- @see: Special modal mode for deletion related keybindings once 'd' key has
+-- been pressed
 --------------------------------------------------------------------------------
 
 vim_delete:bind({}, 'b', function() execute_function( vim_delete_word_backward ) end)
@@ -328,28 +341,15 @@ vim_delete:bind({"shift"}, '6', function() execute_function( delete_backward_lin
 -- this mode has less keybindings than the vim-mode
 --------------------------------------------------------------------------------
 
---------------------------------------------------------------------------------
 -- Switch to vim normal mode
---------------------------------------------------------------------------------
-
 emacs:bind({}, 'escape', function() enter_vim_normal() end)
 
---------------------------------------------------------------------------------
 -- Movement related bindings
---------------------------------------------------------------------------------
-
 emacs:bind({"alt"}, 'b', move_backward_word)
-
 emacs:bind({"alt"}, 'f', move_forward_word)
-
 emacs:bind({"alt", "shift"}, '[', move_forward_paragraph)
-
 emacs:bind({"alt", "shift"}, ']', move_backward_paragraph)
 
---------------------------------------------------------------------------------
 -- Deletion related bindings
---------------------------------------------------------------------------------
-
 emacs:bind({"alt"}, 'delete', delete_word_forward)
-
 emacs:bind({"alt"}, 'd', delete_word_backward)
