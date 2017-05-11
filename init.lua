@@ -5,6 +5,9 @@
 -- @author: Andrew McBurney
 --------------------------------------------------------------------------------
 
+-- String representation of the last number pressed
+local number_pressed = ""
+
 -- Last function executed
 local last_function = nil
 
@@ -20,8 +23,7 @@ end
 -- Modal keybindings
 --------------------------------------------------------------------------------
 
-local emacs  = hs.hotkey.modal.new()
-
+local emacs = hs.hotkey.modal.new()
 local normal = hs.hotkey.modal.new()
 local vim_delete = hs.hotkey.modal.new()
 
@@ -29,8 +31,8 @@ local vim_delete = hs.hotkey.modal.new()
 -- Images for notifications
 --------------------------------------------------------------------------------
 
-local vim_image    = hs.image.imageFromPath("./hs-hybrid/images/vim.png")
-local emacs_image  = hs.image.imageFromPath("./hs-hybrid/images/emacs.png")
+local vim_image = hs.image.imageFromPath("./hs-hybrid/images/vim.png")
+local emacs_image = hs.image.imageFromPath("./hs-hybrid/images/emacs.png")
 local hybrid_image = hs.image.imageFromPath("./hs-hybrid/images/hybrid.png")
 
 --------------------------------------------------------------------------------
@@ -38,8 +40,8 @@ local hybrid_image = hs.image.imageFromPath("./hs-hybrid/images/hybrid.png")
 --------------------------------------------------------------------------------
 
 local vim_message = 'Vim-mode enabled. Enter \'insert-mode\' for emacs bindings'
-local emacs_message  = 'Emacs-mode enabled. \'esc\' to enable Vim-mode'
-local hybrid_enable  = 'Hybrid-mode enabled. \'command\' + \'esc\' to disable'
+local emacs_message = 'Emacs-mode enabled. \'esc\' to enable Vim-mode'
+local hybrid_enable = 'Hybrid-mode enabled. \'command\' + \'esc\' to disable'
 local hybrid_disable = 'Hybrid-mode disabled. \'command\' + \'esc\' to enable'
 
 --------------------------------------------------------------------------------
@@ -68,6 +70,7 @@ function enter_emacs()
   vim_delete:exit()
   emacs:enter()
   notify_user('Emacs', emacs_message, emacs_image)
+  last_function = nil
 end
 
 -- Enable / Disable hybrid mode
@@ -97,52 +100,42 @@ end)
 
 local function move_right()
   hs.eventtap.keyStroke({}, "Right")
-  last_function = move_right
 end
 
 local function move_left()
   hs.eventtap.keyStroke({}, "Left")
-  last_function = move_left
 end
 
 local function move_up()
   hs.eventtap.keyStroke({}, "Up")
-  last_function = move_up
 end
 
 local function move_down()
   hs.eventtap.keyStroke({}, "Down")
-  last_function = move_down
 end
 
 local function move_forward_word()
   hs.eventtap.keyStroke({"alt"}, "Right")
-  last_function = move_forward_word
 end
 
 local function move_backward_word()
   hs.eventtap.keyStroke({"alt"}, "Left")
-  last_function = move_backward_word
 end
 
 local function move_forward_line()
   hs.eventtap.keyStroke({"cmd"}, "Right")
-  last_function = move_forward_line
 end
 
 local function move_backward_line()
   hs.eventtap.keyStroke({"cmd"}, "Left")
-  last_function = move_backward_line
 end
 
 local function move_forward_paragraph()
   hs.eventtap.keyStroke({"alt"}, "Up")
-  last_function = move_forward_paragraph
 end
 
 local function move_backward_paragraph()
   hs.eventtap.keyStroke({"alt"}, "Down")
-  last_function = move_backward_paragraph
 end
 
 --------------------------------------------------------------------------------
@@ -151,7 +144,6 @@ end
 
 local function undo()
   hs.eventtap.keyStroke({"cmd"}, "z")
-  last_function = undo
 end
 
 --------------------------------------------------------------------------------
@@ -160,32 +152,27 @@ end
 
 local function delete()
   hs.eventtap.keyStroke({}, "delete")
-  last_function = delete
 end
 
 local function fndelete()
   right()
   delete()
-  last_function = fndelete
 end
 
 local function delete_word_forward()
   hs.eventtap.keyStroke({"alt", "shift"}, "Right")
   hs.eventtap.keyStroke({}, "delete")
-  last_function = delete_word_forward
 end
 
 local function delete_word_backward()
   hs.eventtap.keyStroke({"alt", "shift"}, "Left")
   hs.eventtap.keyStroke({}, "delete")
-  last_function = delete_word_backward
 end
 
 local function delete_line()
   move_backward_line()
   hs.eventtap.keyStroke({"ctrl"}, "k")
   delete()
-  last_function = delete_line
 end
 
 --------------------------------------------------------------------------------
@@ -194,7 +181,6 @@ end
 
 local function paste()
   hs.eventtap.keyStroke({"cmd"}, "v")
-  last_function = paste
 end
 
 --------------------------------------------------------------------------------
@@ -204,75 +190,73 @@ end
 local function vim_a()
   enter_emacs()
   move_right()
-  last_function = nil
 end
 
 local function vim_shift_a()
   enter_emacs()
   move_forward_line()
-  last_function = nil
+end
+
+local function vim_shift_g()
+  hs.eventtap.keyStroke({"cmd"}, "Down")
 end
 
 local function vim_i()
   enter_emacs()
-  last_function = nil
 end
 
 local function vim_shift_i()
   enter_emacs()
   move_backward_line()
-  last_function = nil
 end
 
 local function vim_o()
   move_forward_line()
   hs.eventtap.keyStroke({}, "Return")
-  last_function = nil
 end
 
 local function vim_shift_o()
   print("implement me")
-  last_function = nil
 end
 
 local function vim_delete_line()
   delete_line()
   enter_vim_normal()
-  last_function = vim_delete_line
 end
 
 local function vim_delete_word_backward()
   delete_word_backward()
   enter_vim_normal()
-  last_function = vim_delete_word_backward
 end
 
 local function vim_delete_word_forward()
   delete_word_forward()
   enter_vim_normal()
-  last_function = vim_delete_word_forward
 end
 
 local function delete_forward_line()
   hs.eventtap.keyStroke({"cmd", "shift"}, "Right")
   delete()
   enter_vim_normal()
-  last_function = delete_forward_line
 end
 
 local function delete_backward_line()
   hs.eventtap.keyStroke({"cmd", "shift"}, "Left")
   delete()
   enter_vim_normal()
-  last_function = delete_backward_line
 end
 
-local function invoke_last_command()
-  last_function()
-end
-
-local function number()
+local function set_number(number)
+  print(number)
   print("implement me")
+end
+
+-- Execute a function 'number' amount of times
+local function execute_function(func)
+
+  func()
+
+  last_function = func
 end
 
 --------------------------------------------------------------------------------
@@ -286,53 +270,56 @@ end
 -- Vim normal mode
 --------------------------------------------------------------------------------
 
--- Basic
-normal:bind({}, 'a', vim_a, nil)
-normal:bind({"shift"}, 'a', vim_shift_a, nil)
-normal:bind({}, 'b', move_backward_word, nil)
-normal:bind({}, 'd', enter_delete_modal, nil)
-normal:bind({}, 'e', move_forward_word, nil)
-normal:bind({}, 'h', move_left, nil)
-normal:bind({}, 'i', vim_i, nil)
-normal:bind({"shift"}, 'i', vim_shift_i, nil)
-normal:bind({}, 'j', move_down, nil)
-normal:bind({}, 'k', move_up, nil)
-normal:bind({}, 'l', move_right, nil)
-normal:bind({}, 'o', vim_o, nil)
-normal:bind({"shift"}, 'o', vim_shift_o, nil)
-normal:bind({}, 'p', paste, nil)
-normal:bind({}, 'u', undo, nil)
-normal:bind({}, 'w', move_forward_word, nil)
-normal:bind({}, 'x', fndelete, nil)
+-- Lowercase
+normal:bind({}, 'a', function() vim_a() end)
+normal:bind({}, 'b', function() execute_function( move_backward_word ) end)
+normal:bind({}, 'd', function() enter_delete_modal() end)
+normal:bind({}, 'e', function() execute_function( move_forward_word ) end)
+normal:bind({}, 'h', function() execute_function( move_left ) end)
+normal:bind({}, 'i', function() vim_i() end)
+normal:bind({}, 'j', function() execute_function( move_down ) end)
+normal:bind({}, 'k', function() execute_function( move_up ) end)
+normal:bind({}, 'l', function() execute_function( move_right ) end)
+normal:bind({}, 'o', function() vim_o() end)
+normal:bind({}, 'p', function() execute_function( paste ) end)
+normal:bind({}, 'u', function() execute_function( undo ) end)
+normal:bind({}, 'w', function() execute_function( move_forward_word ) end)
+normal:bind({}, 'x', function() execute_function( fndelete ) end)
+
+-- Uppercase
+normal:bind({"shift"}, 'a', function() vim_shift_a() end)
+normal:bind({"shift"}, 'g', function() execute_function( vim_shift_g ) end)
+normal:bind({"shift"}, 'i', function() vim_shift_i() end)
+normal:bind({"shift"}, 'o', function() vim_shift_o() end)
 
 -- Numbers
-normal:bind({}, '0', number, nil)
-normal:bind({}, '1', number, nil)
-normal:bind({}, '2', number, nil)
-normal:bind({}, '3', number, nil)
-normal:bind({}, '4', number, nil)
-normal:bind({}, '5', number, nil)
-normal:bind({}, '6', number, nil)
-normal:bind({}, '7', number, nil)
-normal:bind({}, '8', number, nil)
-normal:bind({}, '9', number, nil)
+normal:bind({}, '0', function() set_number(0) end)
+normal:bind({}, '1', function() set_number(1) end)
+normal:bind({}, '2', function() set_number(2) end)
+normal:bind({}, '3', function() set_number(3) end)
+normal:bind({}, '4', function() set_number(4) end)
+normal:bind({}, '5', function() set_number(5) end)
+normal:bind({}, '6', function() set_number(6) end)
+normal:bind({}, '7', function() set_number(7) end)
+normal:bind({}, '8', function() set_number(8) end)
+normal:bind({}, '9', function() set_number(9) end)
 
 -- Symbols / Other
-normal:bind({}, '.', invoke_last_command, nil)
-normal:bind({"shift"}, '4', move_forward_line, nil, move_forward_line)   -- $
-normal:bind({"shift"}, '6', move_backward_line, nil, move_backward_line) -- ^
 normal:bind({}, 'escape', function() end)
+normal:bind({"shift"}, '4', function() execute_function( move_forward_line ) end)
+normal:bind({"shift"}, '6', function() execute_function( move_backward_line ) end)
 
 --------------------------------------------------------------------------------
 -- Vim delete mode
 --------------------------------------------------------------------------------
 
-vim_delete:bind({}, 'b', vim_delete_word_backward, nil)
-vim_delete:bind({}, 'd', vim_delete_line, nil)
-vim_delete:bind({}, 'e', vim_delete_word_forward, nil)
-vim_delete:bind({}, 'w', vim_delete_word_forward, nil)
-vim_delete:bind({"shift"}, '4', delete_forward_line, nil, delete_forward_line)
-vim_delete:bind({"shift"}, '6', delete_backward_line, nil, delete_backward_line)
+vim_delete:bind({}, 'b', function() execute_function( vim_delete_word_backward ) end)
+vim_delete:bind({}, 'd', function() execute_function( vim_delete_line ) end)
+vim_delete:bind({}, 'e', function() execute_function( vim_delete_word_forward ) end)
+vim_delete:bind({}, 'w', function() execute_function( vim_delete_word_forward ) end)
+
+vim_delete:bind({"shift"}, '4', function() execute_function( delete_forward_line ) end)
+vim_delete:bind({"shift"}, '6', function() execute_function( delete_backward_line ) end)
 
 --------------------------------------------------------------------------------
 -- Emacs
@@ -351,20 +338,18 @@ emacs:bind({}, 'escape', function() enter_vim_normal() end)
 -- Movement related bindings
 --------------------------------------------------------------------------------
 
-emacs:bind({"alt"}, 'b', move_backward_word, nil, move_backward_word)
+emacs:bind({"alt"}, 'b', move_backward_word)
 
-emacs:bind({"alt"}, 'f', move_forward_word, nil, move_forward_word)
+emacs:bind({"alt"}, 'f', move_forward_word)
 
-emacs:bind({"alt", "shift"}, '[', move_forward_paragraph, nil,
-  move_forward_paragraph)
+emacs:bind({"alt", "shift"}, '[', move_forward_paragraph)
 
-emacs:bind({"alt", "shift"}, ']', move_backward_paragraph, nil,
-  move_backward_paragraph)
+emacs:bind({"alt", "shift"}, ']', move_backward_paragraph)
 
 --------------------------------------------------------------------------------
 -- Deletion related bindings
 --------------------------------------------------------------------------------
 
-emacs:bind({"alt"}, 'delete', delete_word_forward, nil, delete_word_forward)
+emacs:bind({"alt"}, 'delete', delete_word_forward)
 
-emacs:bind({"alt"}, 'd', delete_word_backward, nil, delete_word_backward)
+emacs:bind({"alt"}, 'd', delete_word_backward)
