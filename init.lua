@@ -5,11 +5,14 @@
 -- @author: Andrew McBurney
 --------------------------------------------------------------------------------
 
--- String representation of the last number pressed
+-- Current number stored for repeated keys
 local number = 0
 
+-- Null function
+local null_func = function() end
+
 -- Last function executed
-local last_function = nil
+local last_function = null_func
 
 -- Boolean flag for hybrid mode
 local hybrid_mode_enabled = false
@@ -70,7 +73,7 @@ function enter_emacs()
   vim_delete:exit()
   emacs:enter()
   notify_user('Emacs', emacs_message, emacs_image)
-  last_function = nil
+  last_function = null_func
 end
 
 -- Enable / Disable hybrid mode
@@ -94,92 +97,15 @@ end)
 -- @see: Functions for binding to modal key modes
 --------------------------------------------------------------------------------
 
---------------------------------------------------------------------------------
--- Movement related functions
---------------------------------------------------------------------------------
+move = require "hs-hybrid/move"
+delete = require "hs-hybrid/delete"
 
-local function move_right()
-  hs.eventtap.keyStroke({}, "Right")
-end
-
-local function move_left()
-  hs.eventtap.keyStroke({}, "Left")
-end
-
-local function move_up()
-  hs.eventtap.keyStroke({}, "Up")
-end
-
-local function move_down()
-  hs.eventtap.keyStroke({}, "Down")
-end
-
-local function move_forward_word()
-  hs.eventtap.keyStroke({"alt"}, "Right")
-end
-
-local function move_backward_word()
-  hs.eventtap.keyStroke({"alt"}, "Left")
-end
-
-local function move_forward_line()
-  hs.eventtap.keyStroke({"cmd"}, "Right")
-end
-
-local function move_backward_line()
-  hs.eventtap.keyStroke({"cmd"}, "Left")
-end
-
-local function move_forward_paragraph()
-  hs.eventtap.keyStroke({"alt"}, "Up")
-end
-
-local function move_backward_paragraph()
-  hs.eventtap.keyStroke({"alt"}, "Down")
-end
-
---------------------------------------------------------------------------------
 -- Undo related functions
---------------------------------------------------------------------------------
-
 local function undo()
   hs.eventtap.keyStroke({"cmd"}, "z")
 end
 
---------------------------------------------------------------------------------
--- Deletion related functions
---------------------------------------------------------------------------------
-
-local function delete()
-  hs.eventtap.keyStroke({}, "delete")
-end
-
-local function fndelete()
-  right()
-  delete()
-end
-
-local function delete_word_forward()
-  hs.eventtap.keyStroke({"alt", "shift"}, "Right")
-  delete()
-end
-
-local function delete_word_backward()
-  hs.eventtap.keyStroke({"alt", "shift"}, "Left")
-  delete()
-end
-
-local function delete_line()
-  move_backward_line()
-  hs.eventtap.keyStroke({"ctrl"}, "k")
-  delete()
-  move_down()
-end
-
---------------------------------------------------------------------------------
 -- Paste functionality
---------------------------------------------------------------------------------
-
 local function paste()
   hs.eventtap.keyStroke({"cmd"}, "v")
 end
@@ -190,12 +116,12 @@ end
 
 local function vim_a()
   enter_emacs()
-  move_right()
+  move.right()
 end
 
 local function vim_shift_a()
   enter_emacs()
-  move_forward_line()
+  move.forward_line()
 end
 
 local function vim_shift_g()
@@ -208,43 +134,16 @@ end
 
 local function vim_shift_i()
   enter_emacs()
-  move_backward_line()
+  move.backward_line()
 end
 
 local function vim_o()
-  move_forward_line()
+  move.forward_line()
   hs.eventtap.keyStroke({}, "Return")
 end
 
 local function vim_shift_o()
   print("implement me")
-end
-
-local function vim_delete_line()
-  delete_line()
-  enter_vim_normal()
-end
-
-local function vim_delete_word_backward()
-  delete_word_backward()
-  enter_vim_normal()
-end
-
-local function vim_delete_word_forward()
-  delete_word_forward()
-  enter_vim_normal()
-end
-
-local function delete_forward_line()
-  hs.eventtap.keyStroke({"cmd", "shift"}, "Right")
-  delete()
-  enter_vim_normal()
-end
-
-local function delete_backward_line()
-  hs.eventtap.keyStroke({"cmd", "shift"}, "Left")
-  delete()
-  enter_vim_normal()
 end
 
 local function set_number(num)
@@ -271,19 +170,19 @@ end
 
 -- Lowercase
 normal:bind({}, 'a', function() vim_a() end)
-normal:bind({}, 'b', function() execute_function( move_backward_word ) end)
+normal:bind({}, 'b', function() execute_function( move.backward_word ) end)
 normal:bind({}, 'd', function() enter_delete_modal() end)
-normal:bind({}, 'e', function() execute_function( move_forward_word ) end)
-normal:bind({}, 'h', function() execute_function( move_left ) end)
+normal:bind({}, 'e', function() execute_function( move.forward_word ) end)
+normal:bind({}, 'h', function() execute_function( move.left ) end)
 normal:bind({}, 'i', function() vim_i() end)
-normal:bind({}, 'j', function() execute_function( move_down ) end)
-normal:bind({}, 'k', function() execute_function( move_up ) end)
-normal:bind({}, 'l', function() execute_function( move_right ) end)
+normal:bind({}, 'j', function() execute_function( move.down ) end)
+normal:bind({}, 'k', function() execute_function( move.up ) end)
+normal:bind({}, 'l', function() execute_function( move.right ) end)
 normal:bind({}, 'o', function() vim_o() end)
 normal:bind({}, 'p', function() execute_function( paste ) end)
 normal:bind({}, 'u', function() execute_function( undo ) end)
-normal:bind({}, 'w', function() execute_function( move_forward_word ) end)
-normal:bind({}, 'x', function() execute_function( fndelete ) end)
+normal:bind({}, 'w', function() execute_function( move.forward_word ) end)
+normal:bind({}, 'x', function() execute_function( delete.fndelete ) end)
 
 -- Uppercase
 normal:bind({"shift"}, 'a', function() vim_shift_a() end)
@@ -308,9 +207,9 @@ normal:bind({"shift"}, '0', function() end)
 normal:bind({"shift"}, '1', function() end)
 normal:bind({"shift"}, '2', function() end)
 normal:bind({"shift"}, '3', function() end)
-normal:bind({"shift"}, '4', function() execute_function( move_forward_line ) end)
+normal:bind({"shift"}, '4', function() execute_function( move.forward_line ) end)
 normal:bind({"shift"}, '5', function() end)
-normal:bind({"shift"}, '6', function() execute_function( move_backward_line ) end)
+normal:bind({"shift"}, '6', function() execute_function( move.backward_line ) end)
 normal:bind({"shift"}, '7', function() end)
 normal:bind({"shift"}, '8', function() end)
 normal:bind({"shift"}, '9', function() end)
@@ -326,13 +225,13 @@ normal:bind({}, 'escape', function() number = 0 end)
 -- been pressed
 --------------------------------------------------------------------------------
 
-vim_delete:bind({}, 'b', function() execute_function( vim_delete_word_backward ) end)
-vim_delete:bind({}, 'd', function() execute_function( vim_delete_line ) end)
-vim_delete:bind({}, 'e', function() execute_function( vim_delete_word_forward ) end)
-vim_delete:bind({}, 'w', function() execute_function( vim_delete_word_forward ) end)
+vim_delete:bind({}, 'b', function() execute_function( delete.vim.word_backward ) end)
+vim_delete:bind({}, 'd', function() execute_function( delete.vim.line ) end)
+vim_delete:bind({}, 'e', function() execute_function( delete.vim.word_forward ) end)
+vim_delete:bind({}, 'w', function() execute_function( delete.vim.word_forward ) end)
 
-vim_delete:bind({"shift"}, '4', function() execute_function( delete_forward_line ) end)
-vim_delete:bind({"shift"}, '6', function() execute_function( delete_backward_line ) end)
+vim_delete:bind({"shift"}, '4', function() execute_function( delete.vim.forward_line ) end)
+vim_delete:bind({"shift"}, '6', function() execute_function( delete.vim.backward_line ) end)
 
 --------------------------------------------------------------------------------
 -- Emacs
@@ -345,11 +244,11 @@ vim_delete:bind({"shift"}, '6', function() execute_function( delete_backward_lin
 emacs:bind({}, 'escape', function() enter_vim_normal() end)
 
 -- Movement related bindings
-emacs:bind({"alt"}, 'b', move_backward_word)
-emacs:bind({"alt"}, 'f', move_forward_word)
-emacs:bind({"alt", "shift"}, '[', move_forward_paragraph)
-emacs:bind({"alt", "shift"}, ']', move_backward_paragraph)
+emacs:bind({"alt"}, 'b', move.backward_word)
+emacs:bind({"alt"}, 'f', move.forward_word)
+emacs:bind({"alt", "shift"}, '[', move.forward_paragraph)
+emacs:bind({"alt", "shift"}, ']', move.backward_paragraph)
 
 -- Deletion related bindings
-emacs:bind({"alt"}, 'delete', delete_word_forward)
-emacs:bind({"alt"}, 'd', delete_word_backward)
+emacs:bind({"alt"}, 'delete', delete.word_forward)
+emacs:bind({"alt"}, 'd', delete.word_backward)

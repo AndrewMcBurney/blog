@@ -18,8 +18,6 @@ Enable and disable hybrid mode with `cmd` + `esc` when hammerspoon is running. W
 ## Status
 This repo is currently a work in progress. Contributions are welcome!
 
-*Unfortunately, due to being in a school term right now, I'm making slow progress on this, but I hope to have most of the emacs keybindings implemented soon since Mac already has some by default.*
-
 ### Emacs
 #### Movement
 | Keybinding    | Description                | Implemented             |
