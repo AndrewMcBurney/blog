@@ -48,22 +48,9 @@ function other.vim_shift_o()
   print("implement me")
 end
 
---------------------------------------------------------------------------------
--- Enable / Disable hybrid mode
---------------------------------------------------------------------------------
-
-hs.hotkey.bind({"cmd"}, "escape", function()
-  if hybrid_mode_enabled then
-    hybrid_mode_enabled = false
-    normal:exit()
-    vim_delete:exit()
-    emacs:exit()
-    notify_user('Hybrid-mode Disabled', hybrid_disable, hybrid_image)
-  else
-    hybrid_mode_enabled = true
-    emacs:enter()
-    notify_user('Hybrid-mode Enabled', hybrid_enable, hybrid_image)
-  end
-end)
+-- Notify the user what mode they're in
+function other.notify_user(title, text, image)
+  hs.notify.new({title=title, informativeText=text}):setIdImage(image):send()
+end
 
 return other
