@@ -48,104 +48,15 @@ local hybrid_enable = 'Hybrid-mode enabled. \'command\' + \'esc\' to disable'
 local hybrid_disable = 'Hybrid-mode disabled. \'command\' + \'esc\' to enable'
 
 --------------------------------------------------------------------------------
--- Change Mode Functions
---
--- @see: Functions to change mode and notify user of the changes
+-- Includes
 --------------------------------------------------------------------------------
 
--- Enter vim normal mode
-function enter_vim_normal()
-  emacs:exit()
-  vim_delete:exit()
-  normal:enter()
-  notify_user('Vim', vim_message, vim_image)
-end
+local mode   = require "hs-hybrid/includes/mode"
+local move   = require "hs-hybrid/includes/move"
+local delete = require "hs-hybrid/includes/delete"
+local other  = require "hs-hybrid/includes/other"
 
--- Enter vim delete mode
-function enter_delete_modal()
-  normal:exit()
-  vim_delete:enter()
-end
-
--- Enter emacs / vim insert mode
-function enter_emacs()
-  normal:exit()
-  vim_delete:exit()
-  emacs:enter()
-  notify_user('Emacs', emacs_message, emacs_image)
-  last_function = null_func
-end
-
--- Enable / Disable hybrid mode
-hs.hotkey.bind({"cmd"}, "escape", function()
-  if hybrid_mode_enabled then
-    hybrid_mode_enabled = false
-    normal:exit()
-    vim_delete:exit()
-    emacs:exit()
-    notify_user('Hybrid-mode Disabled', hybrid_disable, hybrid_image)
-  else
-    hybrid_mode_enabled = true
-    emacs:enter()
-    notify_user('Hybrid-mode Enabled', hybrid_enable, hybrid_image)
-  end
-end)
-
---------------------------------------------------------------------------------
--- Binding Functions
---
--- @see: Functions for binding to modal key modes
---------------------------------------------------------------------------------
-
-move = require "hs-hybrid/move"
-delete = require "hs-hybrid/delete"
-
--- Undo related functions
-local function undo()
-  hs.eventtap.keyStroke({"cmd"}, "z")
-end
-
--- Paste functionality
-local function paste()
-  hs.eventtap.keyStroke({"cmd"}, "v")
-end
-
---------------------------------------------------------------------------------
--- Vim specific functions
---------------------------------------------------------------------------------
-
-local function vim_a()
-  enter_emacs()
-  move.right()
-end
-
-local function vim_shift_a()
-  enter_emacs()
-  move.forward_line()
-end
-
-local function vim_shift_g()
-  hs.eventtap.keyStroke({"cmd"}, "Down")
-end
-
-local function vim_i()
-  enter_emacs()
-end
-
-local function vim_shift_i()
-  enter_emacs()
-  move.backward_line()
-end
-
-local function vim_o()
-  move.forward_line()
-  hs.eventtap.keyStroke({}, "Return")
-end
-
-local function vim_shift_o()
-  print("implement me")
-end
-
+-- Updates current number stored for repeated keys
 local function set_number(num)
   number = number .. num
 end
@@ -171,7 +82,7 @@ end
 -- Lowercase
 normal:bind({}, 'a', function() vim_a() end)
 normal:bind({}, 'b', function() execute_function( move.backward_word ) end)
-normal:bind({}, 'd', function() enter_delete_modal() end)
+normal:bind({}, 'd', function() mode.enter_delete_modal() end)
 normal:bind({}, 'e', function() execute_function( move.forward_word ) end)
 normal:bind({}, 'h', function() execute_function( move.left ) end)
 normal:bind({}, 'i', function() vim_i() end)
@@ -241,7 +152,7 @@ vim_delete:bind({"shift"}, '6', function() execute_function( delete.vim.backward
 --------------------------------------------------------------------------------
 
 -- Switch to vim normal mode
-emacs:bind({}, 'escape', function() enter_vim_normal() end)
+emacs:bind({}, 'escape', function() mode.enter_vim_normal() end)
 
 -- Movement related bindings
 emacs:bind({"alt"}, 'b', move.backward_word)

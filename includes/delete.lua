@@ -2,9 +2,6 @@
 -- Deletion related functions
 --------------------------------------------------------------------------------
 
-move = require "hs-hybrid/move"
--- TODO: add notify here
-
 local delete = {}
 
 function delete.delete()
@@ -41,29 +38,29 @@ delete.vim = {}
 
 function delete.vim.line()
   delete.line()
-  enter_vim_normal()
+  mode.enter_vim_normal()
 end
 
 function delete.vim.word_backward()
   delete.word_backward()
-  enter_vim_normal()
+  mode.enter_vim_normal()
 end
 
 function delete.vim.word_forward()
   delete.word_forward()
-  enter_vim_normal()
+  mode.enter_vim_normal()
 end
 
 function delete.vim.forward_line()
   hs.eventtap.keyStroke({"cmd", "shift"}, "Right")
   delete.delete()
-  enter_vim_normal()
+  mode.enter_vim_normal()
 end
 
 function delete.vim.backward_line()
   hs.eventtap.keyStroke({"cmd", "shift"}, "Left")
   delete.delete()
-  enter_vim_normal()
+  mode.enter_vim_normal()
 end
 
 return delete
