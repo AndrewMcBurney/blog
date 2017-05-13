@@ -4,12 +4,6 @@
 -- @see: Keybindings for normal vim-mode.
 --------------------------------------------------------------------------------
 
--- Includes
-local delete = require "hs-hybrid/includes/delete"
-local other  = require "hs-hybrid/includes/other"
-local mode   = require "hs-hybrid/includes/mode"
-local move   = require "hs-hybrid/includes/move"
-
 -- Current number stored for repeated keys
 local number = 0
 
@@ -47,21 +41,21 @@ mode.normal:bind({}, 'x', function() execute( delete.fndelete ) end)
 
 -- Uppercase
 mode.normal:bind({"shift"}, 'a', function() other.vim_shift_a() end)
-mode.normal:bind({"shift"}, 'g', function() execute( vim_shift_g ) end)
+mode.normal:bind({"shift"}, 'g', function() other.vim_shift_g() end)
 mode.normal:bind({"shift"}, 'i', function() other.vim_shift_i() end)
 mode.normal:bind({"shift"}, 'o', function() other.vim_shift_o() end)
 
 -- Numbers
-mode.normal:bind({}, '0', function() other.set_number(0) end)
-mode.normal:bind({}, '1', function() other.set_number(1) end)
-mode.normal:bind({}, '2', function() other.set_number(2) end)
-mode.normal:bind({}, '3', function() other.set_number(3) end)
-mode.normal:bind({}, '4', function() other.set_number(4) end)
-mode.normal:bind({}, '5', function() other.set_number(5) end)
-mode.normal:bind({}, '6', function() other.set_number(6) end)
-mode.normal:bind({}, '7', function() other.set_number(7) end)
-mode.normal:bind({}, '8', function() other.set_number(8) end)
-mode.normal:bind({}, '9', function() other.set_number(9) end)
+mode.normal:bind({}, '0', function() set_number(0) end)
+mode.normal:bind({}, '1', function() set_number(1) end)
+mode.normal:bind({}, '2', function() set_number(2) end)
+mode.normal:bind({}, '3', function() set_number(3) end)
+mode.normal:bind({}, '4', function() set_number(4) end)
+mode.normal:bind({}, '5', function() set_number(5) end)
+mode.normal:bind({}, '6', function() set_number(6) end)
+mode.normal:bind({}, '7', function() set_number(7) end)
+mode.normal:bind({}, '8', function() set_number(8) end)
+mode.normal:bind({}, '9', function() set_number(9) end)
 
 -- Symbols
 mode.normal:bind({"shift"}, '0', function() end)

@@ -5,11 +5,6 @@
 -- this mode has less keybindings than the vim-mode
 --------------------------------------------------------------------------------
 
--- Includes
-local delete = require "hs-hybrid/includes/delete"
-local mode   = require "hs-hybrid/includes/mode"
-local move   = require "hs-hybrid/includes/move"
-
 -- Switch to vim normal mode
 mode.emacs:bind({}, 'escape', function() mode.enter_vim_normal() end)
 

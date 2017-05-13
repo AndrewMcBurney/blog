@@ -4,10 +4,6 @@
 -- @see: Functions to change mode and notify user of the changes
 --------------------------------------------------------------------------------
 
-local delete = require "hs-hybrid/includes/delete"
-local other  = require "hs-hybrid/includes/other"
-local move   = require "hs-hybrid/includes/move"
-
 local mode = {}
 
 -- Modal keybindings
@@ -26,7 +22,7 @@ function mode.enter_vim_normal()
   other.notify_user(
     'Vim',
     'Vim-mode enabled. Enter \'insert-mode\' for emacs bindings',
-    hs.image.imageFromPath("../hs-hybrid/images/vim.png")
+    hs.image.imageFromPath("./hs-hybrid/images/vim.png")
   )
 end
 
@@ -44,7 +40,7 @@ function mode.enter_emacs()
   other.notify_user(
     'Emacs',
     'Emacs-mode enabled. \'esc\' to enable Vim-mode',
-    hs.image.imageFromPath("../hs-hybrid/images/emacs.png")
+    hs.image.imageFromPath("./hs-hybrid/images/emacs.png")
   )
   last_function = nil
 end
@@ -59,7 +55,7 @@ function mode.toggle_hybrid_mode()
     other.notify_user(
       'Hybrid-mode Disabled',
       'Hybrid-mode disabled. \'command\' + \'esc\' to enable',
-      hs.image.imageFromPath("../hs-hybrid/images/hybrid.png")
+      hs.image.imageFromPath("./hs-hybrid/images/hybrid.png")
     )
   else
     mode.hybrid_mode_enabled = true

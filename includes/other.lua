@@ -4,9 +4,6 @@
 -- @see
 --------------------------------------------------------------------------------
 
-local mode   = require "hs-hybrid/includes/mode"
-local move   = require "hs-hybrid/includes/move"
-
 local other = {}
 
 function other.undo()

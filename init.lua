@@ -6,7 +6,10 @@
 --------------------------------------------------------------------------------
 
 -- Includes
-local mode   = require "hs-hybrid/includes/mode"
+delete = require "hs-hybrid/includes/delete"
+other  = require "hs-hybrid/includes/other"
+mode   = require "hs-hybrid/includes/mode"
+move   = require "hs-hybrid/includes/move"
 
 -- Modes
 local vim    = require "hs-hybrid/modes/vim"
