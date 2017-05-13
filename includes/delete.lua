@@ -1,6 +1,11 @@
 --------------------------------------------------------------------------------
 -- Deletion related functions
+--
+-- @see:
 --------------------------------------------------------------------------------
+
+local mode   = require "hs-hybrid/includes/mode"
+local move   = require "hs-hybrid/includes/move"
 
 local delete = {}
 
@@ -29,10 +34,6 @@ function delete.line()
   delete.delete()
   move.down()
 end
-
---------------------------------------------------------------------------------
--- Vim delete modal keybindings function
---------------------------------------------------------------------------------
 
 delete.vim = {}
 

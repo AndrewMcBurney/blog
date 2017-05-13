@@ -1,6 +1,11 @@
 --------------------------------------------------------------------------------
 -- Other functions
+--
+-- @see
 --------------------------------------------------------------------------------
+
+local mode   = require "hs-hybrid/includes/mode"
+local move   = require "hs-hybrid/includes/move"
 
 local other = {}
 
@@ -11,10 +16,6 @@ end
 function other.paste()
   hs.eventtap.keyStroke({"cmd"}, "v")
 end
-
---------------------------------------------------------------------------------
--- Vim specific functions
---------------------------------------------------------------------------------
 
 function other.vim_a()
   mode.enter_emacs()
@@ -48,7 +49,6 @@ function other.vim_shift_o()
   print("implement me")
 end
 
--- Notify the user what mode they're in
 function other.notify_user(title, text, image)
   hs.notify.new({title=title, informativeText=text}):setIdImage(image):send()
 end
